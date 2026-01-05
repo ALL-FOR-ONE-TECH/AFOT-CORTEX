@@ -81,7 +81,7 @@ Choose your platform:
 **Option 1: .deb Package (Recommended)**
 ```bash
 # Download
-curl -LO https://github.com/karthikeyanV2K/AFOT-Coretex/raw/main/releases/cortex_1.0.0_amd64.deb
+curl -LO https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX/releases/download/V1.0.0/cortex_1.0.0_amd64.deb
 
 # Install
 sudo dpkg -i cortex_1.0.0_amd64.deb
@@ -93,7 +93,7 @@ cortex --help
 **Option 2: Binary**
 ```bash
 # Download
-curl -LO https://github.com/karthikeyanV2K/AFOT-Coretex/raw/main/releases/cortex-linux-x64.tar.gz
+curl -LO https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX/releases/download/V1.0.0/cortex-linux-x64.tar.gz
 
 # Extract
 tar xzf cortex-linux-x64.tar.gz
@@ -111,7 +111,7 @@ cortex --help
 **For Intel Macs**:
 ```bash
 # Download
-curl -LO https://github.com/karthikeyanV2K/AFOT-Coretex/raw/main/releases/cortex-macos-intel.tar.gz
+curl -LO https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX/releases/download/V1.0.0/cortex-macos-intel.tar.gz
 
 # Extract
 tar xzf cortex-macos-intel.tar.gz
@@ -127,7 +127,7 @@ cortex --help
 **For Apple Silicon (M1/M2/M3)**:
 ```bash
 # Download
-curl -LO https://github.com/karthikeyanV2K/AFOT-Coretex/raw/main/releases/cortex-macos-arm.tar.gz
+curl -LO https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX/releases/download/V1.0.0/cortex-macos-arm.tar.gz
 
 # Extract
 tar xzf cortex-macos-arm.tar.gz
@@ -142,17 +142,13 @@ cortex --help
 
 #### Windows
 
-**Build from source** (binaries coming soon):
+**Pre-built binary**:
 ```bash
-# Install Rust first
-# https://rustup.rs/
+# Download from releases page
+# https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX/releases/tag/V1.0.0
 
-# Clone and build
-git clone https://github.com/karthikeyanV2K/AFOT-Coretex
-cd AFOT-Coretex
-cargo build --release --bin cortex
-
-# Binary at: target\release\cortex.exe
+# Extract cortex.exe
+# Add to PATH or run from directory
 ```
 
 ---
@@ -163,8 +159,8 @@ cargo build --release --bin cortex
 
 ```bash
 # Clone the repository
-git clone https://github.com/karthikeyanV2K/AFOT-Coretex
-cd AFOT-Coretex/Demo
+git clone https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX
+cd AFOT-CORTEX/Demo
 
 # Bind the demo tools
 cortex bind capabilities.yaml
@@ -364,51 +360,6 @@ You: Run my custom security audit script on example.com
 
 ---
 
-## 📖 Documentation
-
-- **[Demo Guide](Demo/README.md)** - Complete walkthrough with examples
-- **[Binding Format](BINDING_FORMAT.md)** - How to create tool manifests
-- **[Download Guide](DOWNLOAD.md)** - Installation instructions
-- **[Architecture](ARCHITECTURE_MIGRATION.md)** - System design
-
----
-
-## 🗂️ Project Structure
-
-```
-AFOT-Coretex/
-├── afot-cortex/              # Core library
-│   ├── src/
-│   │   ├── binding/          # Manifest system
-│   │   ├── sandbox/          # Execution engine
-│   │   ├── interceptor/      # Code detection
-│   │   └── llm/              # Ollama client
-│   └── Cargo.toml
-│
-├── afot-cortex-cli/          # CLI application
-│   ├── src/
-│   │   └── main.rs          # All commands
-│   └── Cargo.toml
-│
-├── Demo/                     # Working example
-│   ├── capabilities.yaml    # Tool manifest
-│   ├── nmap.py              # Network scanner
-│   ├── folder_creator.py    # Folder tool
-│   └── README.md            # Demo guide
-│
-├── releases/                 # Pre-built binaries
-│   ├── cortex-linux-x64.tar.gz
-│   ├── cortex-macos-intel.tar.gz
-│   ├── cortex-macos-arm.tar.gz
-│   └── cortex_1.0.0_amd64.deb
-│
-├── README.md                 # This file
-├── LICENSE                   # MIT License
-└── Cargo.toml               # Workspace config
-```
-
----
-
 ## 🎨 Features
 
 ### Conversation Memory
@@ -469,13 +420,6 @@ chmod +x cortex
 export PATH="/usr/local/bin:$PATH"
 ```
 
-### Build Errors
-```bash
-# Clean and rebuild
-cargo clean
-cargo build --release --bin cortex
-```
-
 ---
 
 ## ⚖️ Legal Notice
@@ -513,6 +457,9 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ## 🙏 Credits
 
+**Created By**:
+- 👨‍💻 **Mr.V2K** - Creator and Lead Developer
+
 **Built With**:
 - 🦀 **Rust** - Systems programming language
 - 🤖 **Ollama** - Local LLM runtime
@@ -527,9 +474,10 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ## 📞 Contact
 
-- **GitHub**: [@karthikeyanV2K](https://github.com/karthikeyanV2K)
-- **Project**: [AFOT-Coretex](https://github.com/karthikeyanV2K/AFOT-Coretex)
-- **Issues**: [Report a bug](https://github.com/karthikeyanV2K/AFOT-Coretex/issues)
+- **Creator**: Mr.V2K
+- **GitHub**: [@ALL-FOR-ONE-TECH](https://github.com/ALL-FOR-ONE-TECH)
+- **Project**: [AFOT-CORTEX](https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX)
+- **Issues**: [Report a bug](https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX/issues)
 
 ---
 
@@ -541,13 +489,13 @@ curl https://ollama.ai/install.sh | sh
 ollama pull llama3.2:3b
 
 # 2. Download CORTEX
-curl -LO https://github.com/karthikeyanV2K/AFOT-Coretex/raw/main/releases/cortex-linux-x64.tar.gz
+curl -LO https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX/releases/download/V1.0.0/cortex-linux-x64.tar.gz
 tar xzf cortex-linux-x64.tar.gz
 sudo mv cortex /usr/local/bin/
 
 # 3. Try the demo
-git clone https://github.com/karthikeyanV2K/AFOT-Coretex
-cd AFOT-Coretex/Demo
+git clone https://github.com/ALL-FOR-ONE-TECH/AFOT-CORTEX
+cd AFOT-CORTEX/Demo
 cortex bind capabilities.yaml
 cortex chat
 

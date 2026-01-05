@@ -2,18 +2,36 @@ name: "network_tools"
 version: "1.0.0"
 base_model: "llama3.2:3b"
 
+# ============================================
+# ENVIRONMENT REQUIREMENTS (Auto-Checked)
+# ============================================
+# These tools check their environment on every run.
+# No separate setup scripts needed!
+#
+# REQUIRED:
+#   - Python 3.6+ (checked automatically)
+#   - nmap (checked automatically, shows install instructions)
+#
+# The tools will fail gracefully with clear error messages
+# if requirements are missing.
+
 bindings:
+  # ==========================================
+  # Folder Creator (No dependencies)
+  # ==========================================
   - name: "create_folder"
     language: "python"
     entrypoint: "folder_creator.py"
-    description: "Creates folders on the file system"
+    description: "Creates folders on the file system. Works on all platforms. No dependencies required."
+    
     input_schema:
       type: "object"
       properties:
         folder_path:
           type: "string"
-          description: "Path where folder should be created"
+          description: "Path where folder should be created (supports ~ for home)"
       required: ["folder_path"]
+    
     output_schema:
       type: "object"
       properties:
@@ -24,41 +42,90 @@ bindings:
         message:
           type: "string"
   
+  # ==========================================
+  # Nmap Scanner (Requires nmap installed)
+  # ==========================================
   - name: "nmap"
     language: "python"
     entrypoint: "nmap.py"
-    description: "Direct nmap command execution via WSL - pass any nmap arguments"
+    description: |
+      Network scanning with nmap. Automatically detects nmap on system.
+      
+      CROSS-PLATFORM:
+      - Windows: Uses WSL nmap if available, or native nmap
+      - Linux: Uses system nmap
+      - macOS: Uses system nmap
+      
+      If nmap is not found, shows platform-specific install instructions.
+    
     input_schema:
       type: "object"
       properties:
         args:
           type: "string"
-          description: "Nmap arguments (e.g., '-sV -p 80,443 192.168.1.1')"
+          description: "Nmap arguments (e.g., '-sV -p 80,443 scanme.nmap.org')"
       required: ["args"]
+    
     output_schema:
       type: "object"
       properties:
+        success:
+          type: "boolean"
         output:
           type: "string"
+        return_code:
+          type: "integer"
 
+# ============================================
+# SECURITY CAPABILITIES
+# ============================================
 capabilities:
+  # File system access (for folder creator)
   file_system_write:
     enabled: true
     allowed_paths:
-      - "C:/temp/*"
-      - "C:/data/*"
-      - "X:/Model_Binding/Main_Test/output/*"
+      - "/tmp/*"              # Linux/Mac temp
+      - "~/data/*"            # User data dir
+      - "~/*"                 # Home directory
+      - "C:/temp/*"           # Windows temp
+      - "C:/data/*"           # Windows data
     blocked_paths:
-      - "C:/Windows"
-      - "C:/Program Files"
+      - "/etc"                # System config
+      - "/usr/bin"            # System binaries
+      - "/System"             # macOS system
+      - "C:/Windows"          # Windows system
+      - "C:/Program Files"    # Windows programs
     require_confirmation: true
   
+  # Network access (for nmap)
   network_access:
     enabled: true
-    unrestricted: true  # Allow ANY nmap command without refusal
-    require_confirmation: false  # No confirmation needed
-    max_timeout: 600   # 10 minutes
-    allowed_domains:
-      - "*"  # Allow all domainsd
-    
-description: "Network tools with nmap scanner and folder creator, with manifest-controlled permissions"
+    unrestricted: true        # Allow scanning any target
+    require_confirmation: false
+    max_timeout: 600         # 10 minutes max
+
+# ============================================
+# DESCRIPTION
+# ============================================
+description: |
+  Network Tools Agent - Self-Contained & Portable
+  
+  FEATURES:
+  ✅ Works across Windows, Linux, macOS
+  ✅ Auto-detects environment on every run
+  ✅ Clear error messages if requirements missing
+  ✅ No separate setup scripts needed
+  
+  REQUIREMENTS:
+  - Python 3.6+ (auto-checked)
+  - nmap (auto-checked with install instructions)
+  
+  USAGE:
+  1. cortex bind capabilities.yaml
+  2. cortex list
+  3. cortex chat
+  
+  EXAMPLES:
+  - "Create folder ~/my_scans"
+  - "Scan scanme.nmap.org"
+  - "Scan 192.168.1.1 ports 80,443"

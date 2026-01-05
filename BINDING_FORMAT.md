@@ -4,6 +4,54 @@ Complete reference for creating tool manifests in AFOT CORTEX.
 
 ---
 
+## ⚠️ CRITICAL: Environment Handling
+
+**CORTEX does NOT auto-install dependencies!**
+
+Your tools MUST check their own environment on every run:
+
+```python
+#!/usr/bin/env python3
+import sys
+
+def check_environment():
+    """Check dependencies before running"""
+    # Check Python version
+    if sys.version_info < (3, 6):
+        print("❌ ERROR: Python 3.6+ required")
+        print(f"   Current: Python {sys.version_info.major}.{sys.version_info.minor}")
+        sys.exit(1)
+    
+    # Check required packages
+    try:
+        import numpy
+        import pandas
+    except ImportError as e:
+        print(f"❌ ERROR: Missing dependency: {e}")
+        print("   Install with: pip install numpy pandas")
+        sys.exit(1)
+    
+    return True
+
+def main():
+    # Always check environment first!
+    check_environment()
+    
+    # Your tool logic here
+    pass
+
+if __name__ == "__main__":
+    main()
+```
+
+**Why?**
+- ✅ Works on any system
+- ✅ Clear error messages
+- ✅ No separate setup scripts needed
+- ✅ Self-contained and portable
+
+---
+
 ## 📋 Manifest Structure
 
 Every CORTEX manifest follows this structure:
@@ -78,7 +126,7 @@ description: "Agent description"
 - name: "my_python_tool"
   language: "python"
   entrypoint: "tools/script.py"
-  description: "Does something cool"
+  description: "Does something cool. Auto-checks environment."
   input_schema:
     type: "object"
     properties:
@@ -88,19 +136,46 @@ description: "Agent description"
     required: ["target"]
 ```
 
-**Python script format**:
+**Python script format (RECOMMENDED - with environment checks)**:
 ```python
 #!/usr/bin/env python3
 import sys
+import shutil
+
+def check_environment():
+    """Verify environment is ready"""
+    # Check Python version
+    if sys.version_info < (3, 6):
+        print("❌ ERROR: Python 3.6+ required")
+        sys.exit(1)
+    
+    # Check required packages
+    try:
+        import requests  # Example dependency
+    except ImportError:
+        print("❌ ERROR: Missing requests package")
+        print("   Install with: pip install requests")
+        sys.exit(1)
+    
+    # Check system tools (if needed)
+    if not shutil.which("nmap"):
+        print("❌ ERROR: nmap not found")
+        print("   Install with: sudo apt install nmap")
+        sys.exit(1)
+    
+    return True
 
 def main():
+    # Always check environment first!
+    check_environment()
+    
     if len(sys.argv) < 2:
-        print("Error: Missing argument")
+        print("Usage: script.py <target>")
         sys.exit(1)
     
     target = sys.argv[1]
     # Your logic here
-    print(f"Processed: {target}")
+    print(f"✅ Processed: {target}")
 
 if __name__ == "__main__":
     main()
@@ -228,7 +303,30 @@ output_schema:
 
 ## ✅ Best Practices
 
-### 1. Clear Descriptions
+### 1. Check Environment in Every Tool (CRITICAL!)
+
+```python
+# ✅ ALWAYS do this in your tools
+def check_environment():
+    """Check dependencies on every run"""
+    if sys.version_info < (3, 6):
+        print("❌ Python 3.6+ required")
+        sys.exit(1)
+    
+    try:
+        import required_package
+    except ImportError:
+        print("❌ Install: pip install required_package")
+        sys.exit(1)
+
+def main():
+    check_environment()  # First thing!
+    # Your code here
+```
+
+**Why?** Your tool will fail gracefully with clear error messages instead of cryptic exceptions.
+
+### 2. Clear Descriptions
 ```yaml
 # ❌ Bad
 description: "Tool"
@@ -277,7 +375,7 @@ name: "nmap_scanner"
 
 ## 📝 Complete Examples
 
-### Example 1: Folder Creator
+### Example 1: Folder Creator (Self-Contained)
 ```yaml
 name: "file_tools"
 version: "1.0.0"
@@ -287,14 +385,23 @@ bindings:
   - name: "create_folder"
     language: "python"
     entrypoint: "folder_creator.py"
-    description: "Creates folders on the file system"
+    description: |
+      Creates folders on the file system.
+      
+      SELF-CONTAINED:
+      - Checks Python 3.6+ on every run
+      - Checks write permissions
+      - Cross-platform (Windows/Linux/macOS)
+      - No external dependencies
+    
     input_schema:
       type: "object"
       properties:
         folder_path:
           type: "string"
-          description: "Path where folder should be created"
+          description: "Path where folder should be created (supports ~ for home)"
       required: ["folder_path"]
+    
     output_schema:
       type: "object"
       properties:
@@ -309,13 +416,41 @@ capabilities:
   file_system_write:
     enabled: true
     allowed_paths:
-      - "C:/temp/*"
-      - "C:/data/*"
+      - "~/data/*"          # User home
+      - "/tmp/*"            # Linux/Mac
+      - "C:/temp/*"         # Windows
     blocked_paths:
-      - "C:/Windows"
+      - "/etc"              # Linux system
+      - "C:/Windows"        # Windows system
     require_confirmation: true
 
-description: "File system utilities"
+description: |
+  File system utilities
+  
+  NO SETUP REQUIRED:
+  Tools check their environment automatically.
+```
+
+**folder_creator.py** (self-checking):
+```python
+#!/usr/bin/env python3
+import sys
+from pathlib import Path
+
+def check_environment():
+    if sys.version_info < (3, 6):
+        print("❌ Python 3.6+ required")
+        sys.exit(1)
+    return True
+
+def create_folder(path):
+    check_environment()  # Check first!
+    Path(path).mkdir(parents=True, exist_ok=True)
+    return {"success": True, "path": str(path)}
+
+if __name__ == "__main__":
+    result = create_folder(sys.argv[1])
+    print(result["message"])
 ```
 
 ### Example 2: Network Scanner
